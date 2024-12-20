@@ -18,7 +18,6 @@ import {get} from "@/net";
 import {ElMessage} from "element-plus";
 import TopicEditor from "@/components/TopicEditor.vue";
 import {useStore} from "@/store";
-import axios from "axios";
 import ColorDot from "@/components/ColorDot.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
@@ -94,7 +93,7 @@ navigator.geolocation.getCurrentPosition(position => {
 </script>
 
 <template>
-    <div style="display: flex;margin: 20px auto;gap: 20px;max-width: 900px">
+    <div style="display: flex;margin: 20px auto;gap: 20px;max-width: 900px;padding: 0 20px">
         <div style="flex: 1">
             <light-card>
                 <div class="create-topic" @click="editor = true">
@@ -212,9 +211,6 @@ navigator.geolocation.getCurrentPosition(position => {
                     </div>
                     <div class="friend-link">
                         <el-image style="height: 100%" src="https://element-plus.org/images/vform-banner.png"/>
-                    </div>
-                    <div class="friend-link">
-                        <el-image style="height: 100%" src="https://element-plus.org/images/sponsors/jnpfsoft.jpg"/>
                     </div>
                 </div>
             </div>
