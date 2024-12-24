@@ -6,10 +6,11 @@ import ImageResize from "quill-image-resize-vue";
 import { ImageExtend, QuillWatch } from "quill-image-super-solution-module";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from "axios";
-import {accessHeader, post} from "@/net";
+import {accessHeader} from "@/net";
 import {ElMessage} from "element-plus";
 import ColorDot from "@/components/ColorDot.vue";
 import {useStore} from "@/store";
+import {apiForumTopicCreate} from "@/net/api/forum";
 
 const store = useStore()
 
@@ -33,7 +34,7 @@ const props = defineProps({
     },
     submit: {
         default: (editor, success) => {
-            post('/api/forum/create-topic', {
+            apiForumTopicCreate({
                 type: editor.type.id,
                 title: editor.title,
                 content: editor.text

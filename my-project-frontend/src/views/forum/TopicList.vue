@@ -13,8 +13,7 @@ import {
     Microphone, CircleCheck, Star, FolderOpened, ArrowRightBold
 } from "@element-plus/icons-vue";
 import Weather from "@/components/Weather.vue";
-import {computed, reactive, ref, watch} from "vue";
-import {get} from "@/net";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {ElMessage} from "element-plus";
 import TopicEditor from "@/components/TopicEditor.vue";
 import {useStore} from "@/store";
@@ -22,6 +21,7 @@ import ColorDot from "@/components/ColorDot.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
 import TopicCollectList from "@/components/TopicCollectList.vue";
+import {apiForumTopicList, apiForumTopTopics, apiForumWeather} from "@/net/api/forum";
 
 const store = useStore()
 
@@ -47,10 +47,10 @@ const today = computed(() => {
     const date = new Date()
     return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
 })
-get('/api/forum/top-topic', data => topics.top = data)
+
 function updateList(){
     if(topics.end) return
-    get(`/api/forum/list-topic?page=${topics.page}&type=${topics.type}`, data => {
+    apiForumTopicList(topics.page, topics.type, data => {
         if(data) {
             data.forEach(d => topics.list.push(d))
             topics.page++
@@ -75,20 +75,24 @@ function resetList() {
 navigator.geolocation.getCurrentPosition(position => {
     const longitude = position.coords.longitude
     const latitude = position.coords.latitude
-    get(`/api/forum/weather?longitude=${longitude}&latitude=${latitude}`, data => {
+    apiForumWeather(longitude, latitude, data => {
         Object.assign(weather, data)
         weather.success = true
     })
 }, error => {
     console.info(error)
     ElMessage.warning('位置信息获取超时，请检测网络设置')
-    get(`/api/forum/weather?longitude=116.40529&latitude=39.90499`, data => {
+    apiForumWeather(116.40529, 39.90499, data => {
         Object.assign(weather, data)
         weather.success = true
     })
 }, {
     timeout: 3000,
     enableHighAccuracy: true
+})
+
+onMounted(() => {
+    apiForumTopTopics(data => topics.top = data)
 })
 </script>
 
