@@ -7,7 +7,7 @@ spring:
   mail:
     host: smtp.163.com
     username: javastudy111@163.com
-    password: QGLYGBVECIASGPWQ
+    password: SFxfE39P9Wf2icKi
   rabbitmq:
     addresses: localhost
     username: admin
@@ -44,4 +44,4 @@ spring:
     username: 'minio'
     password: 'password'
   weather:
-    key: 7abbc24d3b4443b597a3b3c676e0f221
+    key: 115bcaf74fb24f73844365290d85862b
