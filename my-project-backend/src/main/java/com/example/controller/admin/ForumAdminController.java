@@ -24,8 +24,9 @@ public class ForumAdminController {
 
     @GetMapping("/list")
     public PageRestBean<TopicPreviewVO> list(@RequestParam int page,
-                                             @RequestParam int size) {
-        JSONObject result = service.listAllTopicByPage(page, size);
+                                             @RequestParam int size,
+                                             @RequestParam(required = false) String keyword) {
+        JSONObject result = service.listAllTopicByPage(page, size, keyword);
         return PageRestBean.success(
                 result.getJSONArray("list").toList(TopicPreviewVO.class),
                 result.getIntValue("total"),

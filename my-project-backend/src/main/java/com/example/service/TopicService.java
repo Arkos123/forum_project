@@ -18,7 +18,7 @@ import java.util.List;
 public interface TopicService extends IService<Topic> {
     List<TopicType> listTypes();
     String createTopic(int uid, TopicCreateVO vo);
-    JSONObject listAllTopicByPage(int page, int type);
+    JSONObject listAllTopicByPage(int page, int type, String keyword);
     List<TopicPreviewVO> listTopicByPage(int page, int type);
     List<TopicTopVO> listTopTopics();
     TopicDetailVO getTopic(int tid, int uid);
