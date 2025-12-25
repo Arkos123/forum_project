@@ -1,6 +1,8 @@
 <script setup>
 import {reactive, ref, watchEffect} from "vue";
 import {
+    apiForumProhibit,
+    apiForumProhibitedList,
     apiForumTopicAllList,
     apiForumTopicDelete, apiForumTopicInvisible,
     apiForumTopicLocked,
@@ -21,6 +23,7 @@ const topicList = reactive({
 })
 
 const types = ref([])
+const prohibitedWords = ref('')
 const findType = type => types.value.find(item => item.id === type)
 
 const deleteTopic = id => {
@@ -57,6 +60,11 @@ const invisibleTopic = (tid, status) => {
     })
 }
 
+const saveProhibitedWords = () => {
+    const list = prohibitedWords.value.split(',')
+    apiForumProhibit(list, () => ElMessage.success('违禁词列表更新成功'))
+}
+
 const refreshList = () => {
     apiForumTopicAllList(topicList.page, topicList.size, data => {
         topicList.list = data.list;
@@ -67,6 +75,7 @@ const refreshList = () => {
 watchEffect(() => refreshList())
 
 apiForumTypes(data => types.value = data)
+apiForumProhibitedList(data => prohibitedWords.value = data.join(','))
 </script>
 
 <template>
@@ -117,6 +126,14 @@ apiForumTypes(data => types.value = data)
                            v-model:page-size="topicList.size"
                            layout="total, sizes, prev, pager, next, jumper"/>
         </div>
+        <div class="prohibited-input">
+            <div class="title">违禁词管理</div>
+            <div class="desc">所有存在违禁词的帖子和评论都将被限制发布，使用逗号隔开</div>
+            <el-input type="textarea" :rows="8" v-model="prohibitedWords"/>
+            <div style="text-align: right;margin-top: 20px;">
+                <el-button @click="saveProhibitedWords" type="primary">保存违禁词列表</el-button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -154,6 +171,10 @@ apiForumTypes(data => types.value = data)
             width: 7px;
             border-radius: 50%;
         }
+    }
+
+    .prohibited-input {
+        margin-top: 50px;
     }
 }
 </style>

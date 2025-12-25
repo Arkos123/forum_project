@@ -19,6 +19,7 @@ import com.example.service.TopicService;
 import com.example.utils.CacheUtils;
 import com.example.utils.Const;
 import com.example.utils.FlowUtils;
+import com.example.utils.ProhibitedUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +44,9 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
 
     @Resource
     CacheUtils cacheUtils;
+
+    @Resource
+    ProhibitedUtils prohibitedUtils;
 
     @Resource
     AccountMapper accountMapper;
@@ -85,6 +89,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         String key = Const.FORUM_TOPIC_CREATE_COUNTER + uid;
         if(!flowUtils.limitPeriodCounterCheck(key, 3, 3600))
             return "发文频繁，请稍后再试！";
+        if(prohibitedUtils.containsProhibitedWord(vo.getContent()))
+            return "包含违禁词，发文失败！";
         Topic topic = new Topic();
         BeanUtils.copyProperties(vo, topic);
         topic.setContent(vo.getContent().toJSONString());
@@ -104,6 +110,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             return "文章内容太多，发文失败！";
         if(!types.contains(vo.getType()))
             return "文章类型非法！";
+        if(prohibitedUtils.containsProhibitedWord(vo.getContent()))
+            return "包含违禁词，发文失败！";
         int result = baseMapper.update(null, Wrappers.<Topic>update()
                 .eq("uid", uid)
                 .eq("id", vo.getId())
@@ -122,6 +130,8 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         String key = Const.FORUM_TOPIC_COMMENT_COUNTER + uid;
         if(!flowUtils.limitPeriodCounterCheck(key, 2, 60))
             return "发表评论频繁，请稍后再试！";
+        if(prohibitedUtils.containsProhibitedWord(vo.getContent()))
+            return "包含违禁词，发文失败！";
         TopicComment comment = new TopicComment();
         comment.setUid(uid);
         BeanUtils.copyProperties(vo, comment);
