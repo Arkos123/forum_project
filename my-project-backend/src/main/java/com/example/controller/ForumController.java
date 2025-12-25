@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.Interact;
+import com.example.entity.dto.Topic;
 import com.example.entity.vo.request.AddCommentVO;
 import com.example.entity.vo.request.TopicCreateVO;
 import com.example.entity.vo.request.TopicUpdateVO;
@@ -125,6 +126,18 @@ public class ForumController {
     public RestBean<Void> deleteComment(@RequestParam @Min(0) int id,
                                         @RequestAttribute(Const.ATTR_USER_ID) int uid){
         topicService.deleteComment(id, uid);
+        return RestBean.success();
+    }
+
+    @GetMapping("/user-topic")
+    public RestBean<List<Topic>> userTopic(@RequestAttribute(Const.ATTR_USER_ID) int uid) {
+        return RestBean.success(topicService.listTopicByUser(uid));
+    }
+
+    @GetMapping("/delete-topic")
+    public RestBean<Void> deleteTopic(@RequestParam @Min(0) int tid,
+                                      @RequestAttribute(Const.ATTR_USER_ID) int uid){
+        topicService.deleteTopic(tid, uid);
         return RestBean.success();
     }
 }

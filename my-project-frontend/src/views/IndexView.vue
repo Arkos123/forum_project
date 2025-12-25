@@ -2,7 +2,7 @@
 import {inject, reactive, ref} from "vue";
 import {
     Bell,
-    ChatDotSquare, Check, Collection, DataLine,
+    ChatDotSquare, Check, CoffeeCup, Collection, DataLine,
     Document, Files,
     Location, Lock, Monitor,
     Notification, Operation,
@@ -34,6 +34,7 @@ const userMenu = [
     }, {
         title: '个人设置', icon: Operation, sub: [
             { title: '个人信息设置', icon: User, index: '/index/user-setting' },
+            { title: '论坛帖子管理', icon: CoffeeCup, index: '/index/forum-setting' },
             { title: '账号安全设置', icon: Lock, index: '/index/privacy-setting' }
         ]
     }

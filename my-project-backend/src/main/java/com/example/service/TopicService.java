@@ -29,7 +29,9 @@ public interface TopicService extends IService<Topic> {
     List<CommentVO> comments(int tid, int pageNumber);
     void deleteComment(int id, int uid);
     void deleteTopic(int id);
+    void deleteTopic(int tid, int uid);
     void setTopicTop(int tid, boolean top);
     void setTopicLocked(int tid, boolean locked);
     void setTopicInvisible(int tid, boolean invisible);
+    List<Topic> listTopicByUser(int uid);
 }

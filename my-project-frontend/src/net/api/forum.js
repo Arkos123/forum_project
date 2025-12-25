@@ -67,3 +67,9 @@ export const apiForumProhibitedList = (success) =>
 
 export const apiForumProhibit = (data, success) =>
     post(`/api/admin/forum/prohibited-save`, data, success)
+
+export const apiForumUserTopic = (success) =>
+    get('api/forum/user-topic', success)
+
+export const apiForumUserTopicDelete = (tid, success) =>
+    get(`api/forum/delete-topic?tid=${tid}`, success)
