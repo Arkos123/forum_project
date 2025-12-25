@@ -193,6 +193,18 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     }
 
     @Override
+    public JSONObject listAllTopicByPage(int page, int size) {
+        Page<Topic> topicPage = baseMapper.selectPage(Page.of(page, size), Wrappers.<Topic>query()
+                .select("id", "title", "uid", "type", "time", "top")
+                .orderByDesc("time"));
+        List<TopicPreviewVO> list = topicPage.getRecords().stream().map(this::resolveToPreview).toList();
+        JSONObject object = new JSONObject();
+        object.put("total", topicPage.getTotal());
+        object.put("list", list);
+        return object;
+    }
+
+    @Override
     public List<TopicPreviewVO> listTopicByPage(int pageNumber, int type) {
         String key = Const.FORUM_TOPIC_PREVIEW_CACHE + pageNumber + ":" + type;
         List<TopicPreviewVO> list = cacheUtils.takeListFromCache(key, TopicPreviewVO.class);
@@ -302,8 +314,10 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         vo.setCollect(baseMapper.interactCount(topic.getId(), "collect"));
         List<String> images = new ArrayList<>();
         StringBuilder previewText = new StringBuilder();
-        JSONArray ops = JSONObject.parseObject(topic.getContent()).getJSONArray("ops");
-        this.shortContent(ops, previewText, obj -> images.add(obj.toString()));
+        if (topic.getContent() != null) {
+            JSONArray ops = JSONObject.parseObject(topic.getContent()).getJSONArray("ops");
+            this.shortContent(ops, previewText, obj -> images.add(obj.toString()));
+        }
         vo.setText(previewText.length() > 300 ? previewText.substring(0, 300) : previewText.toString());
         vo.setImages(images);
         return vo;
