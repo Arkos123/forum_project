@@ -13,6 +13,7 @@ import {
 import LightCard from "@/components/LightCard.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import {apiNotificationDelete, apiNotificationDeleteAll, apiNotificationList} from "@/net/api/user";
+import AiChatWindow from "@/components/AiChatWindow.vue";
 
 const userMenu = [
     {
@@ -66,6 +67,7 @@ function deleteAllNotification() {
 
 <template>
     <div class="main-content" v-loading="loading" element-loading-text="正在进入，请稍后...">
+        <ai-chat-window/>
         <el-container style="height: 100%" v-if="!loading">
             <el-header class="main-content-header">
                 <div style="width: 320px;height: 32px">
