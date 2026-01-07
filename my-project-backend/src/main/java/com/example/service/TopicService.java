@@ -7,6 +7,7 @@ import com.example.entity.dto.Topic;
 import com.example.entity.dto.TopicType;
 import com.example.entity.vo.request.AddCommentVO;
 import com.example.entity.vo.request.TopicCreateVO;
+import com.example.entity.vo.request.TopicTypeCreateVO;
 import com.example.entity.vo.request.TopicUpdateVO;
 import com.example.entity.vo.response.*;
 
@@ -14,6 +15,9 @@ import java.util.List;
 
 public interface TopicService extends IService<Topic> {
     List<TopicType> listTypes();
+    void updateTopicType(TopicTypeVO vo);
+    void deleteTopicType(int id);
+    void createTopicType(TopicTypeCreateVO vo);
     String createTopic(int uid, TopicCreateVO vo);
     JSONObject listAllTopicByPage(int page, int type, String keyword);
     List<TopicPreviewVO> listTopicByPage(int page, int type);

@@ -2,12 +2,10 @@
 import {apiForumUserTopic, apiForumUserTopicDelete} from "@/net/api/forum";
 import {ref} from "vue";
 import Card from "@/components/Card.vue";
-import {useStore} from "@/store";
 import TopicTag from "@/components/TopicTag.vue";
 import {Clock, Delete, Hide, Lock} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 
-const store = useStore()
 const list = ref([])
 
 const deleteTopic = (id) => {

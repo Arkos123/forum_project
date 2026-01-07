@@ -76,3 +76,12 @@ export const apiForumUserTopicDelete = (tid, success) =>
 
 export const apiTopicSearch = (keyword, success) =>
     get(`/api/forum/search-topic?keyword=${keyword}`, success)
+
+export const apiTopicTypeUpdate = (data, success) =>
+    post(`/api/admin/forum/update-type`, data, success)
+
+export const apiTopicTypeDelete = (tid, success) =>
+    get(`/api/admin/forum/delete-type?tid=${tid}`, success)
+
+export const apiTopicTypeCreate = (data, success) =>
+    post(`/api/admin/forum/create-type`, data, success)
