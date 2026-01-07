@@ -108,6 +108,16 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     }
 
     @Override
+    public void changeTopicType(int tid, int type) {
+        if(baseMapper.update(null, Wrappers.<Topic>update()
+                .eq("id", tid)
+                .set("type", type)
+        ) > 1) {
+            cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_CACHE + "*");
+        }
+    }
+
+    @Override
     public String createTopic(int uid, TopicCreateVO vo) {
         if(!textLimitCheck(vo.getContent(), 20000))
             return "文章内容太多，发文失败！";

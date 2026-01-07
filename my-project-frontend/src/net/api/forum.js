@@ -85,3 +85,6 @@ export const apiTopicTypeDelete = (tid, success) =>
 
 export const apiTopicTypeCreate = (data, success) =>
     post(`/api/admin/forum/create-type`, data, success)
+
+export const apiTopicChangeType = (tid, type, success) =>
+    get(`api/admin/forum/change-topic-type?tid=${tid}&type=${type}`, success)

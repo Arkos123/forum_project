@@ -97,4 +97,11 @@ public class ForumAdminController {
         service.createTopicType(vo);
         return RestBean.success();
     }
+
+    @GetMapping("/change-topic-type")
+    public RestBean<Void> changeTopicType(@RequestParam int tid,
+                                          @RequestParam int type) {
+        service.changeTopicType(tid, type);
+        return RestBean.success();
+    }
 }

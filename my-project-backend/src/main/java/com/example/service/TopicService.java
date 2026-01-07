@@ -18,6 +18,7 @@ public interface TopicService extends IService<Topic> {
     void updateTopicType(TopicTypeVO vo);
     void deleteTopicType(int id);
     void createTopicType(TopicTypeCreateVO vo);
+    void changeTopicType(int tid, int type);
     String createTopic(int uid, TopicCreateVO vo);
     JSONObject listAllTopicByPage(int page, int type, String keyword);
     List<TopicPreviewVO> listTopicByPage(int page, int type);

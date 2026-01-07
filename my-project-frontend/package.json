@@ -12,7 +12,7 @@
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^10.3.0",
     "axios": "^1.4.0",
-    "element-plus": "^2.3.9",
+    "element-plus": "2.11.3",
     "markdown-it": "^14.1.0",
     "pinia": "^2.1.6",
     "quill-delta-to-html": "^0.12.1",
