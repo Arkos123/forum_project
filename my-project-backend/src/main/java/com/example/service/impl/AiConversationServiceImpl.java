@@ -46,7 +46,7 @@ public class AiConversationServiceImpl
     @Transactional
     public void deleteConversation(int userId, int id) {
         AiConversation conv = this.getById(id);
-        if (conv == null || conv.getUserId() != userId) return;
+        if (conv == null || !conv.getUserId().equals(userId)) return;
         messageMapper.delete(new QueryWrapper<AiConversationMessage>()
                 .eq("conversation_id", id));
         this.removeById(id);
@@ -70,7 +70,11 @@ public class AiConversationServiceImpl
     }
 
     @Override
-    public List<JSONObject> loadMessages(int conversationId) {
+    public List<JSONObject> loadMessages(int userId, int conversationId) {
+        AiConversation conv = this.getById(conversationId);
+        if (conv == null || !conv.getUserId().equals(userId))
+            throw new IllegalArgumentException("无权访问此对话");
+
         List<AiConversationMessage> records = messageMapper.selectList(
                 new QueryWrapper<AiConversationMessage>()
                         .eq("conversation_id", conversationId)

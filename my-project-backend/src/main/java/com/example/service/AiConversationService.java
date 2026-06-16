@@ -11,5 +11,5 @@ public interface AiConversationService extends IService<AiConversation> {
     AiConversation createConversation(int userId, String title);
     void deleteConversation(int userId, int id);
     void saveMessage(int conversationId, String role, String content, String messageType);
-    List<JSONObject> loadMessages(int conversationId);
+    List<JSONObject> loadMessages(int userId, int conversationId);
 }
