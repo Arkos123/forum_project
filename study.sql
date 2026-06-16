@@ -158,6 +158,35 @@ INSERT INTO `db_image_store` (`uid`, `name`, `time`) VALUES (1, '/cache/20231028
 COMMIT;
 
 -- ----------------------------
+-- Table structure for db_announcement
+-- ----------------------------
+DROP TABLE IF EXISTS `db_announcement`;
+CREATE TABLE `db_announcement` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `uid` int DEFAULT NULL,
+  `title` varchar(100) NOT NULL,
+  `summary` varchar(255) DEFAULT NULL,
+  `content` text NOT NULL,
+  `published` tinyint DEFAULT '0',
+  `top` tinyint DEFAULT '0',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `publish_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_published_top_time` (`published`,`top`,`publish_time`),
+  KEY `idx_uid` (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of db_announcement
+-- ----------------------------
+BEGIN;
+INSERT INTO `db_announcement` (`id`, `uid`, `title`, `summary`, `content`, `published`, `top`, `create_time`, `update_time`, `publish_time`) VALUES (1, 1, '关于期末考试安排的通知', '本学期期末考试安排已发布，请同学们及时查看考试时间和考场信息。', '{\"ops\":[{\"insert\":\"各位同学：\\n\\n本学期期末考试安排已经发布，请登录教务系统查看个人考试时间、考场和座位信息。请提前 15 分钟到达考场，并携带学生证或校园卡。\\n\\n如考试时间存在冲突，请在 6 月 20 日前联系所在学院教学办公室处理。\\n\"}]}', 1, 1, '2026-06-16 09:00:00', '2026-06-16 09:20:00', '2026-06-16 09:20:00');
+INSERT INTO `db_announcement` (`id`, `uid`, `title`, `summary`, `content`, `published`, `top`, `create_time`, `update_time`, `publish_time`) VALUES (2, 1, '图书馆暑期开放时间调整', '暑假期间图书馆开放时间将调整为 8:30-21:30。', '{\"ops\":[{\"insert\":\"暑假期间图书馆开放时间调整如下：\\n\\n周一至周日 8:30-21:30 正常开放；每周五上午闭馆整理图书，12:00 后恢复开放。请同学们合理安排学习时间。\\n\"}]}', 1, 0, '2026-06-15 15:30:00', '2026-06-15 16:00:00', '2026-06-15 16:00:00');
+INSERT INTO `db_announcement` (`id`, `uid`, `title`, `summary`, `content`, `published`, `top`, `create_time`, `update_time`, `publish_time`) VALUES (3, 1, '校园网络维护预告', '网络中心将进行设备维护，部分楼栋网络可能短暂中断。', '{\"ops\":[{\"insert\":\"网络中心计划于本周六 00:00-02:00 进行核心设备维护。维护期间，教学楼、实验楼部分区域网络可能出现短暂中断。\\n\\n请正在进行在线提交或远程实验的同学提前保存数据。\\n\"}]}', 0, 0, '2026-06-14 18:00:00', '2026-06-14 18:00:00', NULL);
+COMMIT;
+
+-- ----------------------------
 -- Table structure for db_notification
 -- ----------------------------
 DROP TABLE IF EXISTS `db_notification`;

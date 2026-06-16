@@ -22,6 +22,7 @@ import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
 import TopicCollectList from "@/components/TopicCollectList.vue";
 import {apiForumTopicList, apiForumTopTopics, apiForumWeather} from "@/net/api/forum";
+import {apiAnnouncementLatest} from "@/net/api/announcement";
 
 const store = useStore()
 
@@ -39,6 +40,7 @@ const topics = reactive({
     end: false,
     top: []
 })
+const announcements = ref([])
 const collects = ref(false)
 
 watch(() => topics.type, () => resetList(), {immediate: true})
@@ -93,6 +95,7 @@ navigator.geolocation.getCurrentPosition(position => {
 
 onMounted(() => {
     apiForumTopTopics(data => topics.top = data)
+    apiAnnouncementLatest(3, data => announcements.value = data)
 })
 </script>
 
@@ -185,12 +188,19 @@ onMounted(() => {
                 <light-card style="margin-top: 10px">
                     <div style="font-weight: bold">
                         <el-icon><CollectionTag/></el-icon>
-                        论坛公告
+                        校园公告
                     </div>
                     <el-divider style="margin: 10px 0"/>
-                    <div style="font-size: 14px;margin: 10px;color: grey">
-                        为认真学习宣传贯彻党的二十大精神,深入贯彻习近平强军思想,
-                        作为迎接办学70周年系列学术活动之一,国防科技大学将于2022年11月24日至26日在长沙举办“国防科技
+                    <el-empty v-if="!announcements.length" :image-size="60" description="暂无公告"/>
+                    <div v-else class="announcement-preview"
+                         v-for="item in announcements"
+                         @click="router.push(`/index/announcement/${item.id}`)">
+                        <div>
+                            <el-tag v-if="item.top" size="small" type="danger">置顶</el-tag>
+                            <span class="announcement-title">{{ item.title }}</span>
+                        </div>
+                        <div class="announcement-summary">{{ item.summary || '暂无摘要' }}</div>
+                        <div class="announcement-time">{{ new Date(item.publishTime || item.createTime).toLocaleDateString() }}</div>
                     </div>
                 </light-card>
                 <light-card style="margin-top: 10px">
@@ -268,6 +278,45 @@ onMounted(() => {
 
     &:hover {
         cursor: pointer;
+    }
+}
+
+.announcement-preview {
+    border-bottom: solid 1px var(--el-border-color);
+    padding: 8px 0;
+    transition: .3s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        cursor: pointer;
+        opacity: 0.7;
+    }
+
+    .announcement-title {
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 6px;
+    }
+
+    .announcement-summary {
+        color: grey;
+        display: -webkit-box;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-top: 5px;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .announcement-time {
+        color: grey;
+        font-size: 12px;
+        margin-top: 4px;
+        text-align: right;
     }
 }
 

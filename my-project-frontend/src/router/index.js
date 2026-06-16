@@ -44,6 +44,14 @@ const router = createRouter({
                         }
                     ]
                 }, {
+                    path: 'announcements',
+                    name: 'announcement-list',
+                    component: () => import('@/views/announcement/AnnouncementList.vue')
+                }, {
+                    path: 'announcement/:id',
+                    name: 'announcement-detail',
+                    component: () => import('@/views/announcement/AnnouncementDetail.vue')
+                }, {
                     path: 'user-setting',
                     name: 'user-setting',
                     component: () => import('@/views/settings/UserSetting.vue')
@@ -88,6 +96,10 @@ const router = createRouter({
                     path: 'forum',
                     name: 'admin-forum',
                     component: () => import('@/views/admin/ForumAdmin.vue')
+                }, {
+                    path: 'announcement',
+                    name: 'admin-announcement',
+                    component: () => import('@/views/admin/AnnouncementAdmin.vue')
                 }
             ]
         }

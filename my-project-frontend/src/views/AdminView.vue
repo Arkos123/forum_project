@@ -1,6 +1,7 @@
 <script setup>
 
 import {
+    Bell,
     ChatDotSquare,
     Location, Message,
     User
@@ -15,7 +16,8 @@ const adminMenu = [
         title: '校园论坛管理', icon: Location, sub: [
             { title: '用户管理', icon: User, index: '/admin/user' },
             { title: '邮件管理', icon: Message, index: '/admin/email' },
-            { title: '帖子广场管理', icon: ChatDotSquare, index: '/admin/forum' }
+            { title: '帖子广场管理', icon: ChatDotSquare, index: '/admin/forum' },
+            { title: '公告管理', icon: Bell, index: '/admin/announcement' }
         ]
     }
 ]
