@@ -54,7 +54,11 @@ public class AiConversationServiceImpl
 
     @Override
     @Transactional
-    public void saveMessage(int conversationId, String role, String content, String messageType) {
+    public void saveMessage(int userId, int conversationId, String role, String content, String messageType) {
+        AiConversation conv = this.getById(conversationId);
+        if (conv == null || !conv.getUserId().equals(userId))
+            throw new IllegalArgumentException("无权访问此对话");
+
         AiConversationMessage msg = new AiConversationMessage();
         msg.setConversationId(conversationId);
         msg.setRole(role);
@@ -63,8 +67,6 @@ public class AiConversationServiceImpl
         msg.setCreatedTime(new Date());
         messageMapper.insert(msg);
 
-        AiConversation conv = new AiConversation();
-        conv.setId(conversationId);
         conv.setUpdatedTime(new Date());
         this.updateById(conv);
     }
