@@ -6,26 +6,25 @@ import com.example.entity.dto.AiConversation;
 import com.example.service.AiConversationService;
 import com.example.service.AiService;
 import com.example.service.ForumTools;
+import com.example.service.ImageTools;
 import com.example.service.WebSearchTools;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.content.Media;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
@@ -47,6 +46,9 @@ public class AiServiceImpl implements AiService {
     WebSearchTools webSearchTools;
 
     @Resource
+    ImageTools imageTools;
+
+    @Resource
     AiConversationService conversationService;
 
     ChatClient chatClient;
@@ -57,6 +59,8 @@ public class AiServiceImpl implements AiService {
                 .defaultSystem("你是校园论坛的AI助手，名字叫「校园AI助手」。你友善、专业，能够帮助学生解答问题。" +
                         "你可以在论坛中搜索帖子、获取最新的帖子信息。" +
                         "当需要互联网上的最新信息时，你可以进行网络搜索。" +
+                        "你还具备图片识别和图片生成能力：当用户上传图片并询问图片内容时，调用 recognize_image 工具来识别；" +
+                        "当用户要求画图、生成图片、创作图像时，调用 generate_image 工具来生成。" +
                         "请用中文回复。")
                 .build();
     }
@@ -127,6 +131,9 @@ public class AiServiceImpl implements AiService {
                     }
                 } else if ("assistant".equals(role)) {
                     messages.add(new AssistantMessage(rawContent));
+                } else if ("system".equals(role)) {
+                    // 工具调用结果等系统上下文，供 AI 参考
+                    messages.add(new SystemMessage(rawContent));
                 }
             }
 
@@ -139,17 +146,15 @@ public class AiServiceImpl implements AiService {
                         + "用户的问题：" + text;
             }
 
-            // 4. 构建当前用户消息（含可能的图片）
+            // 4. 构建当前用户消息（DeepSeek 不支持多模态，改为文本提示图片 URL 让 AI 调用工具识别）
             if (imageUrls != null && !imageUrls.isEmpty()) {
-                var userMsgBuilder = UserMessage.builder().text(finalText);
-                for (String url : imageUrls) {
-                    MimeType mime = detectImageMimeType(url);
-                    userMsgBuilder.media(Media.builder()
-                            .mimeType(mime)
-                            .data(url)
-                            .build());
+                StringBuilder extendedText = new StringBuilder(finalText);
+                extendedText.append("\n\n[用户上传了以下图片，可调用图片识别工具 recognize_image 来分析图片内容：\n");
+                for (int i = 0; i < imageUrls.size(); i++) {
+                    extendedText.append(i + 1).append(". ").append(imageUrls.get(i)).append("\n");
                 }
-                messages.add(userMsgBuilder.build());
+                extendedText.append("]");
+                messages.add(new UserMessage(extendedText.toString()));
             } else {
                 messages.add(new UserMessage(finalText));
             }
@@ -171,6 +176,7 @@ public class AiServiceImpl implements AiService {
             // 5. 注册工具
             List<ToolCallback> toolCallbacks = new ArrayList<>();
             Collections.addAll(toolCallbacks, ToolCallbacks.from(forumTools));
+            Collections.addAll(toolCallbacks, ToolCallbacks.from(imageTools));
             if (enableWebSearch) {
                 Collections.addAll(toolCallbacks, ToolCallbacks.from(webSearchTools));
             }
@@ -207,12 +213,16 @@ public class AiServiceImpl implements AiService {
                             .name("message")
                             .data(toolEvent.toJSONString()));
 
-                    // 执行工具
+                    // 执行工具并保存结果到对话历史
                     for (ToolCallback callback : toolCallbacks) {
                         if (callback.getToolDefinition().name().equals(toolCall.name())) {
                             String result = callback.call(toolCall.arguments(), new ToolContext(java.util.Map.of()));
                             toolResponses.add(new ToolResponseMessage.ToolResponse(
                                     toolCall.id(), toolCall.name(), result));
+                            // 保存工具调用结果到历史，供后续对话恢复上下文
+                            conversationService.saveMessage(userId, conversationId, "system",
+                                    "调用工具「" + toolCall.name() + "」的结果：\n" + result,
+                                    "tool_result");
                             break;
                         }
                     }
@@ -321,23 +331,6 @@ public class AiServiceImpl implements AiService {
         }
 
         return emitter;
-    }
-
-    /**
-     * 根据图片URL后缀检测MIME类型
-     */
-    private MimeType detectImageMimeType(String url) {
-        String lower = url.toLowerCase();
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg"))
-            return MimeTypeUtils.IMAGE_JPEG;
-        else if (lower.endsWith(".gif"))
-            return MimeTypeUtils.IMAGE_GIF;
-        else if (lower.endsWith(".webp"))
-            return MimeTypeUtils.parseMimeType("image/webp");
-        else if (lower.endsWith(".bmp"))
-            return MimeTypeUtils.parseMimeType("image/bmp");
-        else // 默认 PNG（含 .png 和无后缀情况）
-            return MimeTypeUtils.IMAGE_PNG;
     }
 
     /**

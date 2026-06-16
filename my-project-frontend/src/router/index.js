@@ -60,6 +60,11 @@ const router = createRouter({
                     name: 'ai-agent',
                     component: () => import('@/views/ai/AiAgent.vue'),
                     meta: { requiresAuth: true }
+                }, {
+                    path: 'ai-customer-service',
+                    name: 'ai-customer-service',
+                    component: () => import('@/views/ai/AiCustomerService.vue'),
+                    meta: { requiresAuth: true }
                 }
             ]
         }, {

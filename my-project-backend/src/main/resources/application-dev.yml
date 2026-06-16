@@ -70,3 +70,5 @@ spring:
       base-url: 'https://api.deepseek.com'
     tavily:
       api-key: ${TAVILY_API_KEY:placeholder}
+    siliconflow:
+      api-key: ${SILICONFLOW_API_KEY:placeholder}

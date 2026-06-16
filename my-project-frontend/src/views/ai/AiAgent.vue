@@ -1,4 +1,5 @@
 <template>
+  <div style="height: 100%;">
   <div class="ai-agent-container">
     <!-- 左侧历史对话栏 -->
     <div class="history-sidebar">
@@ -48,13 +49,17 @@
              class="message-wrapper"
              :class="msg.role === 'user' ? 'user-message' : msg.role === 'tool' ? 'tool-message' : 'assistant-message'">
           <div class="avatar" v-if="msg.role !== 'tool'">
-            <el-avatar :size="36" v-if="msg.role === 'assistant'" icon="ChatDotSquare" />
+            <el-avatar :size="36" v-if="msg.role === 'assistant'" style="background: #e8f5e9; color: #2e7d32;">🤖</el-avatar>
             <el-avatar :size="36" v-else :src="store.user.avatar ? store.avatarUrl : undefined">
               {{ store.user.username?.[0]?.toUpperCase() }}
             </el-avatar>
           </div>
           <div class="message-bubble" :class="{ 'tool-bubble': msg.role === 'tool' }">
             <div v-if="msg.fileName" class="file-attach-badge">📄 {{ msg.fileName }}</div>
+            <div v-if="msg.imageUrls && msg.imageUrls.length" class="image-preview">
+              <img v-for="(url, i) in msg.imageUrls" :key="i" :src="url"
+                   class="chat-image" @click="previewImage(url)" />
+            </div>
             <div class="message-content" v-html="renderMarkdown(msg.content)"></div>
             <div v-if="idx === messages.length - 1 && isLoading" class="typing-indicator">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -65,29 +70,31 @@
 
       <div class="input-area">
         <div class="input-toolbar">
-          <el-upload
-              :show-file-list="false"
-              :before-upload="handleImageUpload"
-              accept="image/*"
-              action="">
-            <el-button :icon="Picture" circle text />
-          </el-upload>
-          <span class="toolbar-label">图片</span>
-          <el-button :icon="Document" circle text @click="triggerFileUpload" />
-          <span class="toolbar-label">文件</span>
-          <input ref="fileInputRef" type="file" hidden
-                 accept=".txt,.md,.csv,.json,.xml,.yaml,.yml,.log,.py,.java,.js,.ts,.vue,.html,.css,.sh,.sql,.rs,.go,.kt"
-                 @change="handleTextFileUpload" />
-          <span v-if="uploadedImages.length > 0" class="upload-preview">
-            <el-tag closable @close="uploadedImages = []" size="small">
-              {{ uploadedImages.length }} 张图片
-            </el-tag>
-          </span>
-          <span v-if="uploadedFileContent" class="upload-preview">
-            <el-tag closable @close="uploadedFileContent = ''; uploadedFileName = ''" type="warning" size="small">
+          <div class="toolbar-buttons">
+            <el-upload
+                :show-file-list="false"
+                :before-upload="handleImageUpload"
+                accept="image/*"
+                action="">
+              <el-button :icon="Picture" circle text />
+            </el-upload>
+            <el-button :icon="Document" circle text @click="triggerFileUpload" />
+            <input ref="fileInputRef" type="file" hidden
+                   accept=".txt,.md,.csv,.json,.xml,.yaml,.yml,.log,.py,.java,.js,.ts,.vue,.html,.css,.sh,.sql,.rs,.go,.kt"
+                   @change="handleTextFileUpload" />
+          </div>
+          <div class="upload-previews" v-if="uploadedImages.length > 0 || uploadedFileContent">
+            <span v-for="(url, i) in uploadedImages" :key="i" class="img-preview-item">
+              <img :src="url" class="img-thumb" @click="previewImage(url)" />
+              <el-button class="img-remove" :icon="Close" size="small" circle
+                         @click="uploadedImages.splice(i, 1)" />
+            </span>
+            <el-tag v-if="uploadedFileContent" closable
+                    @close="uploadedFileContent = ''; uploadedFileName = ''"
+                    type="warning" size="small">
               📄 {{ uploadedFileName }}
             </el-tag>
-          </span>
+          </div>
         </div>
         <div class="input-row">
           <el-input
@@ -111,12 +118,20 @@
       </div>
     </div>
   </div>
+
+  <!-- 图片查看器 -->
+  <el-dialog v-model="imagePreviewVisible" :show-close="true"
+             width="auto" align-center center
+             class="image-preview-dialog">
+    <img :src="previewImageUrl" style="max-width: 80vw; max-height: 80vh; border-radius: 4px;" />
+  </el-dialog>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { useStore } from '@/store'
-import { Plus, Delete, ChatDotSquare, Promotion, Picture, Document } from '@element-plus/icons-vue'
+import { Plus, Delete, ChatDotSquare, Promotion, Picture, Document, Close } from '@element-plus/icons-vue'
 import MarkdownIt from 'markdown-it'
 import {
   apiConversationList,
@@ -126,7 +141,9 @@ import {
   apiChatWithConversation,
   apiUploadTextFile
 } from '@/net/api/ai'
+import { takeAccessToken } from '@/net'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import axios from 'axios'
 
 const md = new MarkdownIt({ html: true })
 const store = useStore()
@@ -143,6 +160,8 @@ const uploadedFileName = ref('')
 const fileInputRef = ref(null)
 const messagesRef = ref(null)
 const switchLoading = ref(false)
+const imagePreviewVisible = ref(false)
+const previewImageUrl = ref('')
 
 onMounted(() => {
   loadConversations()
@@ -183,23 +202,38 @@ function switchConversation(id) {
       let text = m.text
       let fileName = null
       let fileContent = null
+      let imageUrls = null
       try {
         const obj = JSON.parse(m.text)
         text = obj.text || text
         fileName = obj.fileName || null
         fileContent = obj.fileContent || null
+        imageUrls = obj.imageUrls || null  // 图片 URL
       } catch { /* 纯文本消息，直接使用 */ }
+      // 工具结果转成历史提示显示
+      if (m.messageType === 'tool_result') {
+        let toolLabel = '🛠️ 已调用工具'
+        if (text.includes('recognize_image')) toolLabel = '🖼️ 已识别图片内容'
+        else if (text.includes('generate_image')) toolLabel = '🎨 已生成图片'
+        return { role: 'tool', content: toolLabel, messageType: 'tool_result' }
+      }
       return {
         role: m.type,
         content: text,
         messageType: m.messageType,
         fileName: fileName,
-        fileContent: fileContent
+        fileContent: fileContent,
+        imageUrls: imageUrls
       }
     })
     switchLoading.value = false
     scrollToBottom()
   })
+}
+
+function previewImage(url) {
+  previewImageUrl.value = url
+  imagePreviewVisible.value = true
 }
 
 function deleteConversation(id) {
@@ -219,17 +253,29 @@ function deleteConversation(id) {
   }).catch(() => {})
 }
 
-function handleImageUpload(file) {
+async function handleImageUpload(file) {
   const formData = new FormData()
   formData.append('file', file)
-  import('@/net').then(({post}) => {
-    post('/api/image/cache', formData, url => {
-      uploadedImages.value.push(url)
-      ElMessage.success('图片已上传')
-    }, () => {
-      ElMessage.error('图片上传失败')
+  try {
+    const {data} = await axios.post('/api/image/cache', formData, {
+      headers: {
+        'Authorization': `Bearer ${takeAccessToken()?.token}`
+      }
     })
-  })
+    if (data.code === 200) {
+      // 后端返回的是 MinIO 路径（如 /cache/20240616/uuid）
+      // 需要拼成完整 URL：http://localhost:8080/images/cache/20240616/uuid
+      const fullUrl = axios.defaults.baseURL + '/images' + data.data
+      uploadedImages.value.push(fullUrl)
+      ElMessage.success('图片已上传')
+    } else {
+      ElMessage.error(data.message || '图片上传失败')
+    }
+  } catch (err) {
+    const msg = err.response?.data?.message || '图片上传失败'
+    ElMessage.error(msg)
+    console.error('图片上传出错:', err)
+  }
   return false
 }
 
@@ -276,7 +322,8 @@ async function sendMessage() {
     role: 'user',
     content: currentText || (currentImages.length > 0 ? '(图片)' : ''),
     messageType: currentImages.length > 0 ? 'image' : 'text',
-    fileName: currentFileContent ? currentFileName : null
+    fileName: currentFileContent ? currentFileName : null,
+    imageUrls: currentImages.length > 0 ? currentImages : null
   }
   messages.value.push(userMsg)
   inputText.value = ''
@@ -323,6 +370,11 @@ async function sendMessage() {
           label = input ? `🔍 正在搜索「${input}」...` : '🔍 正在搜索互联网...'
         } else if (toolName.includes('search')) {
           label = input ? `📝 正在搜索论坛「${input}」...` : '📝 正在搜索论坛帖子...'
+        } else if (toolName.includes('recognize_image')) {
+          label = '🖼️ 正在识别图片内容...'
+        } else if (toolName.includes('generate_image')) {
+          const prompt = toolData.input?.prompt || ''
+          label = prompt ? `🎨 正在生成图片「${prompt}」...` : '🎨 正在生成图片...'
         } else {
           label = `🛠️ 正在调用工具: ${toolName}`
         }
@@ -538,6 +590,36 @@ function scrollToBottom() {
       overflow-x: auto;
     }
 
+    :deep(img) {
+      max-width: 100%;
+      max-height: 360px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
+    .image-preview {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .chat-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      cursor: pointer;
+      object-fit: cover;
+      border: 1px solid var(--el-border-color-light);
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+
+
     .file-attach-badge {
       display: inline-block;
       font-size: 12px;
@@ -587,14 +669,47 @@ function scrollToBottom() {
     gap: 8px;
     margin-bottom: 8px;
 
-    .upload-preview {
-      font-size: 12px;
+    .toolbar-buttons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .toolbar-label {
-      font-size: 12px;
-      color: var(--el-text-color-secondary);
-      margin-right: 8px;
+    .upload-previews {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .img-preview-item {
+      position: relative;
+      display: inline-flex;
+
+      .img-thumb {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 1px solid var(--el-border-color-light);
+      }
+
+      .img-remove {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 18px;
+        height: 18px;
+        background: var(--el-color-danger);
+        color: #fff;
+        border: none;
+        --el-button-size: 18px;
+
+        &:hover {
+          background: var(--el-color-danger-light-3);
+        }
+      }
     }
   }
 
@@ -620,4 +735,5 @@ function scrollToBottom() {
 <style>
 .markdown-body p { margin: 0 0 8px; }
 .markdown-body p:last-child { margin: 0; }
+.image-preview-dialog .el-dialog__body { padding: 0; }
 </style>

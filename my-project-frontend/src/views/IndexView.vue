@@ -3,7 +3,7 @@ import {inject, reactive, ref} from "vue";
 import {
     Bell,
     ChatDotSquare, ChatLineSquare, Check, CoffeeCup,
-    Location, Lock, MagicStick,
+    Headset, Location, Lock, MagicStick,
     Operation,
     Search,
     User
@@ -26,7 +26,8 @@ const userMenu = [
         ]
     }, {
         title: '校园AI助手', icon: MagicStick, sub: [
-            { title: 'AI 对话', icon: ChatLineSquare, index: '/index/ai-agent' }
+            { title: 'AI 对话', icon: ChatLineSquare, index: '/index/ai-agent' },
+            { title: '智能客服', icon: Headset, index: '/index/ai-customer-service' }
         ]
     }, {
         title: '个人设置', icon: Operation, sub: [
