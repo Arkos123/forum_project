@@ -8,14 +8,14 @@ springdoc:
     operations-sorter: alpha
 spring:
   config:
-    import: "optional:file:./.secrets.properties"
+    import: "optional:file:./.env"
   data:
     redis:
       database: 1
   mail:
     host: smtp.163.com
-    username: javastudy111@163.com
-    password: ${MAIL_PASSWORD:placeholder}
+    username: ${STMP_EMAIL:}
+    password: ${STMP_EMAIL_PASSWORD:}
   rabbitmq:
     addresses: localhost
     username: admin
@@ -63,12 +63,12 @@ spring:
     password: 'password'
   weather:
     api-host: 'jx46h4hdc6.re.qweatherapi.com'
-    key: 1f0ad6b3bd38450e8cc7d7e1a5a293db
+    key: ${WEATHER_KEY:}
   ai:
     deepseek:
-      api-key: ${DEEPSEEK_API_KEY:placeholder}
+      api-key: ${DEEPSEEK_KEY:}
       base-url: 'https://api.deepseek.com'
     tavily:
-      api-key: ${TAVILY_API_KEY:placeholder}
+      api-key: ${TAVILY_API_KEY:}
     siliconflow:
-      api-key: ${SILICONFLOW_API_KEY:placeholder}
+      api-key: ${SILICONFLOW_API_KEY:}

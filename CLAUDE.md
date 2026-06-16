@@ -103,9 +103,3 @@ Topic and comment content is stored as **Quill Delta JSON** in MySQL. Preview te
 MinIO requires manual bucket creation: visit `http://localhost:9001`, create bucket `study`.
 
 ES uses TLS — `setup.sh` copies the CA cert from the ES container to `my-project-backend/src/main/resources/es/http_ca.crt`.
-
-## 参考仓库: spring-ai-demo
-
-> **注意**: 此目录不属于本论坛项目，是一个独立的 Spring AI agent开发学习案例集合，存放于本仓库中方便 AI 开发时参考。
-
-[仓库索引](./spring-ai-demo/PROJECT_INDEX.md)

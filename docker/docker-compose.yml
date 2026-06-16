@@ -34,7 +34,7 @@ services:
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_0900_ai_ci
     ports:
-      - "3600:3306"
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ../study.sql:/docker-entrypoint-initdb.d/01-init.sql

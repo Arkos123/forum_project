@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+#.idea
 *.iws
 *.iml
 *.ipr
@@ -32,8 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-### Secrets ###
-.secrets.properties
-
 .playwright-mcp
-*.png
+
+.env
+.env.*
+!.env.example
