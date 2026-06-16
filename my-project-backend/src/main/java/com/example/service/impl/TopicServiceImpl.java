@@ -77,6 +77,12 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
                 .stream()
                 .map(TopicType::getId)
                 .collect(Collectors.toSet());
+        // 启动时将 MySQL 中已有帖子同步到 ES
+        try {
+            syncAllTopicsToEs();
+        } catch (Exception ignored) {
+            // ES 可能还没就绪，后续增删改会自动同步
+        }
     }
 
     @Override
@@ -136,6 +142,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         topic.createIntro();
         if(this.save(topic)) {
             cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_CACHE + "*");
+            syncTopicToEs(topic);
             return null;
         } else {
             return "内部错误，请联系管理员！";
@@ -159,7 +166,12 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
                 .set("type", vo.getType())
                 .set("intro", Topic.recreateIntro(vo.getContent()))
         );
-        return result > 0 ? null : "文章被锁定，无法进行修改";
+        if (result > 0) {
+            Topic updated = baseMapper.selectById(vo.getId());
+            syncTopicToEs(updated);
+            return null;
+        }
+        return "文章被锁定，无法进行修改";
     }
 
     @Override
@@ -235,6 +247,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         baseMapper.deleteById(id);
         cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_CACHE + "*");
         baseMapper.deleteTopicCollect(id);
+        deleteTopicFromEs(id);
     }
 
     @Override
@@ -246,6 +259,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
         if(result > 0) {
             cacheUtils.deleteCachePattern(Const.FORUM_TOPIC_PREVIEW_CACHE + "*");
             baseMapper.deleteTopicCollect(tid);
+            deleteTopicFromEs(tid);
         }
     }
 
@@ -461,5 +475,33 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
             if(length > max) return false;
         }
         return true;
+    }
+
+    // ==================== ES 同步 ====================
+
+    @Override
+    public void syncTopicToEs(Topic topic) {
+        TopicDocument doc = new TopicDocument();
+        BeanUtils.copyProperties(topic, doc);
+        doc.setTop(topic.getTop() != null && topic.getTop() == 1);
+        doc.setLocked(topic.getLocked() != null && topic.getLocked() == 1);
+        doc.setInvisible(topic.getInvisible() != null && topic.getInvisible() == 1);
+        topicRepository.save(doc);
+    }
+
+    @Override
+    public void deleteTopicFromEs(int tid) {
+        topicRepository.deleteById(tid);
+    }
+
+    @Override
+    public void syncAllTopicsToEs() {
+        List<Topic> topics = baseMapper.selectList(null);
+        for (Topic topic : topics) {
+            // 只同步可见的帖子到 ES
+            if (topic.getInvisible() == null || topic.getInvisible() == 0) {
+                syncTopicToEs(topic);
+            }
+        }
     }
 }

@@ -4,6 +4,9 @@ springdoc:
   swagger-ui:
     operations-sorter: alpha
 spring:
+  data:
+    redis:
+      database: 1
   mail:
     host: smtp.163.com
     username: javastudy111@163.com
@@ -24,7 +27,7 @@ spring:
     username: elastic
     password: 123456
   datasource:
-    url: jdbc:mysql://localhost:3306/study_main
+    url: jdbc:mysql://localhost:3600/study_main
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -42,9 +45,9 @@ spring:
     verify:
       mail-limit: 60
     flow:
-      period: 3
-      limit: 50
-      block: 30
+      period: 1
+      limit: 500
+      block: 3
     cors:
       origin: '*'
       credentials: false
@@ -54,9 +57,9 @@ spring:
     username: 'minio'
     password: 'password'
   weather:
-    api-host: 'kv487n5dxd.re.qweatherapi.com'
-    key: 8d3b57acbb0745adbdf56f8052fa8779
+    api-host: 'jx46h4hdc6.re.qweatherapi.com'
+    key: 1f0ad6b3bd38450e8cc7d7e1a5a293db
   ai:
     deepseek:
-      api-key: 'application-d5f62d037aedf3d2331980c6b3b4054d'
-      base-url: 'http://localhost:8099/chat/api/019b6eeb-bebc-7493-b604-23ca6ff2c8bf'
+      api-key: '***REMOVED***'
+      base-url: 'https://api.deepseek.com'

@@ -9,6 +9,9 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import java.util.List;
 
 @Repository
@@ -29,4 +32,9 @@ public interface TopicRepository extends ElasticsearchRepository<TopicDocument, 
             @HighlightField(name = "intro", parameters = @HighlightParameters(numberOfFragments = 1))
     })
     List<SearchHit<TopicDocument>> findByTitleOrIntro(String keyword);
+
+    /**
+     * 查询最新帖子（RAG 兜底：关键词搜不到时用最近帖子作为上下文）
+     */
+    List<TopicDocument> findByOrderByTimeDesc(PageRequest pageRequest);
 }

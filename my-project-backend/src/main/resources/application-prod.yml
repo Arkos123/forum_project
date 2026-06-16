@@ -8,6 +8,9 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
+  data:
+    redis:
+      database: 1
   mail:
     host: smtp.163.com
     username: javastudy111@163.com
