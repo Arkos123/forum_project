@@ -104,4 +104,10 @@ public class ForumAdminController {
         service.changeTopicType(tid, type);
         return RestBean.success();
     }
+
+    @GetMapping("/sync-to-es")
+    public RestBean<Void> syncToEs() {
+        service.syncAllTopicsToEs();
+        return RestBean.success();
+    }
 }

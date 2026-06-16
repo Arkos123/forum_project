@@ -37,4 +37,7 @@ public interface TopicService extends IService<Topic> {
     void setTopicInvisible(int tid, boolean invisible);
     List<Topic> listTopicByUser(int uid);
     List<TopicSearchVO> searchTopic(String keyword);
+    void syncTopicToEs(Topic topic);
+    void deleteTopicFromEs(int tid);
+    void syncAllTopicsToEs();
 }

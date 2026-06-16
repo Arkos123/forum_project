@@ -4,10 +4,13 @@ springdoc:
   swagger-ui:
     operations-sorter: alpha
 spring:
+  data:
+    redis:
+      database: 1
   mail:
     host: smtp.163.com
-    username: javastudy111@163.com
-    password: SFxfE39P9Wf2icKi
+    username: ${STMP_EMAIL:}
+    password: ${STMP_EMAIL_PASSWORD:}
   rabbitmq:
     addresses: localhost
     username: admin
@@ -54,9 +57,9 @@ spring:
     username: 'minio'
     password: 'password'
   weather:
-    api-host: 'kv487n5dxd.re.qweatherapi.com'
-    key: 8d3b57acbb0745adbdf56f8052fa8779
+    api-host: 'jx46h4hdc6.re.qweatherapi.com'
+    key: ${WEATHER_KEY:}
   ai:
     deepseek:
-      api-key: 'application-d5f62d037aedf3d2331980c6b3b4054d'
-      base-url: 'http://localhost:8099/chat/api/019b6eeb-bebc-7493-b604-23ca6ff2c8bf'
+      api-key: ${DEEPSEEK_KEY:}
+      base-url: 'https://api.deepseek.com'
