@@ -32,7 +32,7 @@ spring:
     username: elastic
     password: 123456
   datasource:
-    url: jdbc:mysql://localhost:3600/study_main
+    url: jdbc:mysql://localhost:3306/study_main
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver

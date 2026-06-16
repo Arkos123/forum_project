@@ -17,6 +17,10 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP SCHEMA IF EXISTS `study_main`;
+CREATE SCHEMA `study_main` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `study_main`;
+
 -- ----------------------------
 -- Table structure for db_account
 -- ----------------------------
@@ -328,6 +332,15 @@ CREATE TABLE IF NOT EXISTS `ai_conversation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI对话会话';
 
 -- ----------------------------
+-- Records of ai_conversation
+-- ----------------------------
+BEGIN;
+INSERT INTO `ai_conversation` (`id`, `user_id`, `title`, `created_time`, `updated_time`) VALUES (1, 1, 'AI助手', '2026-06-16 20:44:26', '2026-06-16 20:44:45');
+INSERT INTO `ai_conversation` (`id`, `user_id`, `title`, `created_time`, `updated_time`) VALUES (2, 1, '搜索帖子', '2026-06-16 21:05:10', '2026-06-16 21:05:48');
+INSERT INTO `ai_conversation` (`id`, `user_id`, `title`, `created_time`, `updated_time`) VALUES (3, 2, '图片识别', '2026-06-16 21:18:32', '2026-06-16 21:19:20');
+COMMIT;
+
+-- ----------------------------
 -- Table structure for ai_conversation_message
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_conversation_message`;
@@ -340,5 +353,23 @@ CREATE TABLE IF NOT EXISTS `ai_conversation_message` (
     `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX `idx_conversation_id` (`conversation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI对话消息';
+
+-- ----------------------------
+-- Records of ai_conversation_message
+-- ----------------------------
+BEGIN;
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (1, 1, 'user', '{"text":"你是？"}', 'text', '2026-06-16 20:44:26');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (2, 1, 'assistant', '你好！我是校园AI助手，可以帮你搜索帖子、浏览最新帖子、识别图片和生成图片。有什么可以帮你的吗？', 'text', '2026-06-16 20:44:28');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (3, 1, 'user', '{"text":"浏览最新帖子"}', 'text', '2026-06-16 20:44:41');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (4, 1, 'system', '调用工具「get_recent_posts」的结果：论坛最新 5 条帖子已返回。', 'tool_result', '2026-06-16 20:44:42');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (5, 1, 'assistant', '论坛最新帖子包括校园新闻、项目更新反馈、测试帖和问题反馈等内容。你想继续查看哪一条？', 'text', '2026-06-16 20:44:45');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (6, 2, 'user', '{"text":"帮我搜索和考研相关的帖子"}', 'text', '2026-06-16 21:05:10');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (7, 2, 'system', '调用工具「search_posts」的结果：找到 3 条和考研相关的帖子。', 'tool_result', '2026-06-16 21:05:13');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (8, 2, 'assistant', '我找到了几条和考研复习、资料分享、自习室占座相关的帖子，可以继续帮你筛选最近发布或回复最多的内容。', 'text', '2026-06-16 21:05:20');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (9, 2, 'user', '{"text":"按最新回复排序"}', 'text', '2026-06-16 21:05:41');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (10, 2, 'assistant', '已按最新回复排序，最前面的是今天更新的考研资料互助帖，其次是自习室拼桌和复试经验分享。', 'text', '2026-06-16 21:05:48');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (11, 3, 'user', '{"text":"这张图片里是什么？","imageUrl":"/image/mock-campus-card.png"}', 'image', '2026-06-16 21:18:32');
+INSERT INTO `ai_conversation_message` (`id`, `conversation_id`, `role`, `content`, `message_type`, `created_time`) VALUES (12, 3, 'assistant', '图片看起来像一张校园卡或学生证，画面中包含姓名、学号、学院信息等字段。建议不要在公开帖子中展示完整证件信息。', 'text', '2026-06-16 21:19:20');
+COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
