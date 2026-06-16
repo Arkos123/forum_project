@@ -2,8 +2,8 @@
 import {inject, reactive, ref} from "vue";
 import {
     Bell,
-    ChatDotSquare, Check, CoffeeCup,
-    Location, Lock,
+    ChatDotSquare, ChatLineSquare, Check, CoffeeCup,
+    Location, Lock, MagicStick,
     Operation,
     Search,
     User
@@ -23,6 +23,10 @@ const userMenu = [
     {
         title: '校园论坛', icon: Location, sub: [
             { title: '帖子广场', icon: ChatDotSquare, index: '/index' }
+        ]
+    }, {
+        title: '校园AI助手', icon: MagicStick, sub: [
+            { title: 'AI 对话', icon: ChatLineSquare, index: '/index/ai-agent' }
         ]
     }, {
         title: '个人设置', icon: Operation, sub: [
@@ -157,7 +161,7 @@ apiForumTypes(data => {
                         <el-menu
                                 router
                                 :default-active="$route.path"
-                                :default-openeds="['1', '2']"
+                                :default-openeds="['1', '2', '3']"
                                 style="min-height: calc(100vh - 55px)">
                             <el-sub-menu :index="(index + 1).toString()"
                                          v-for="(menu, index) in userMenu">
