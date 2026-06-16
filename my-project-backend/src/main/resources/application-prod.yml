@@ -51,4 +51,15 @@ spring:
     username: 'minio'
     password: 'password'
   weather:
+    api-host: 'jx46h4hdc6.re.qweatherapi.com'
     key: 7abbc24d3b4443b597a3b3c676e0f221
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:placeholder}
+      base-url: 'https://api.deepseek.com'
+    tavily:
+      api-key: ${TAVILY_API_KEY:placeholder}
+    siliconflow:
+      api-key: ${SILICONFLOW_API_KEY:placeholder}
+    zhipuai:
+      api-key: ${ZHIPUAI_API_KEY:placeholder}
