@@ -9,6 +9,11 @@ springdoc:
 spring:
   config:
     import: "optional:file:./.env"
+  cloud:
+    nacos:
+      discovery:
+        enabled: ${NACOS_DISCOVERY_ENABLED:true}
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
   data:
     redis:
       database: 1
@@ -54,6 +59,7 @@ spring:
       limit: 3000
       block: 5
     cors:
+      enabled: ${BACKEND_CORS_ENABLED:false}
       origin: '*'
       credentials: false
       methods: '*'

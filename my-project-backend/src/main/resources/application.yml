@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: forum-monolith-service
   profiles:
     active: '@environment@'
   servlet:

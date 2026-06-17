@@ -14,11 +14,11 @@ echo ""
 echo "[1/4] 清理旧容器..."
 cd "$SCRIPT_DIR"
 docker compose down 2>/dev/null || true
-docker rm -f forum-es forum-rabbitmq forum-minio 2>/dev/null || true
+docker rm -f forum-nacos forum-es forum-rabbitmq forum-minio 2>/dev/null || true
 
 # 2. 启动服务
 echo ""
-echo "[2/4] 启动 Elasticsearch + RabbitMQ + MinIO..."
+echo "[2/4] 启动 Nacos + Elasticsearch + RabbitMQ + MinIO..."
 docker compose up -d
 
 # 3. 等待 ES 就绪，复制 CA 证书
@@ -45,11 +45,14 @@ echo " 部署完成！"
 echo "============================================"
 echo ""
 echo "服务状态："
+echo "  Nacos         : http://localhost:8848/nacos"
 echo "  Elasticsearch : https://localhost:9200  (elastic / 123456)"
 echo "  RabbitMQ      : http://localhost:15672  (admin / admin)"
 echo "  MinIO         : http://localhost:9001   (minio / password)"
 echo ""
 echo "API 端口："
+echo "  Nacos API     : localhost:8848"
+echo "  Nacos gRPC    : localhost:9848 / localhost:9849"
 echo "  RabbitMQ AMQP : localhost:5672"
 echo "  MinIO S3      : localhost:9000"
 echo ""

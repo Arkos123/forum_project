@@ -1,6 +1,32 @@
-version: "3.8"
-
 services:
+  # ============================================================
+  # Nacos - 服务注册/发现
+  # 控制台/API: http://localhost:8848
+  # gRPC: localhost:9848 / localhost:9849
+  # ============================================================
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: forum-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: "false"
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+      JVM_XMN: 128m
+    ports:
+      - "8848:8848"   # 控制台与 OpenAPI
+      - "9848:9848"   # 客户端 gRPC 通信端口
+      - "9849:9849"   # 服务端 gRPC 通信端口
+    volumes:
+      - nacos-data:/home/nacos/data
+      - nacos-logs:/home/nacos/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   # ============================================================
   # Redis 7 - 缓存/限流/JWT黑名单
   # 端口: localhost:6379
@@ -116,6 +142,8 @@ services:
       retries: 5
 
 volumes:
+  nacos-data:
+  nacos-logs:
   redis-data:
   mysql-data:
   es-data:

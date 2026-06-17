@@ -8,7 +8,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import 'element-plus/dist/index.css'
 import '@/assets/quill.css'
 
-axios.defaults.baseURL = 'http://localhost:8080'
+axios.defaults.baseURL = 'http://localhost:8081'
 
 const app = createApp(App)
 

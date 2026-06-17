@@ -12,9 +12,11 @@ const accessHeader = () => {
 
 const defaultError = (error) => {
     console.error(error)
-    const status = error.response.status
+    const status = error.response?.status
     if (status === 429) {
         ElMessage.error(error.response.data.message)
+    } else if (!error.response) {
+        ElMessage.error('网络连接异常，请检查服务是否正常运行')
     } else {
         ElMessage.error('发生了一些错误，请联系管理员')
     }
