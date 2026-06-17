@@ -23,9 +23,16 @@ import ColorDot from "@/components/ColorDot.vue";
 import router from "@/router";
 import TopicTag from "@/components/TopicTag.vue";
 import TopicCollectList from "@/components/TopicCollectList.vue";
-import {apiForumTopicList, apiForumTopTopics, apiForumWeather} from "@/net/api/forum";
+import {
+    apiForumTopicDraftDelete,
+    apiForumTopicDraftList,
+    apiForumTopicDraftSave,
+    apiForumTopicList,
+    apiForumTopTopics,
+    apiForumWeather
+} from "@/net/api/forum";
 import {apiAnnouncementLatest} from "@/net/api/announcement";
-import {deleteTopicDraft, listTopicDrafts, topicDraftSummary} from "@/utils/topicDraft";
+import {clearTopicDrafts, listTopicDrafts, topicDraftSummary} from "@/utils/topicDraft";
 
 const store = useStore()
 
@@ -102,23 +109,23 @@ function openTopicEditor() {
 }
 
 function reloadDrafts() {
-    drafts.list = listTopicDrafts(store.user.id)
+    apiForumTopicDraftList(data => drafts.list = data || [])
 }
 
 function openDraft(draft) {
     draftEditor.id = draft.id
     draftEditor.title = draft.title || ''
     draftEditor.type = draft.type || null
-    draftEditor.content = draft.content ? JSON.stringify(draft.content) : ''
+    draftEditor.content = draft.content || ''
     drafts.show = false
     editor.value = true
 }
 
 function onDraftSave(draft) {
     draftEditor.id = draft.id
-    draftEditor.title = draft.title
-    draftEditor.type = draft.type
-    draftEditor.content = draft.content ? JSON.stringify(draft.content) : ''
+    draftEditor.title = draft.title || ''
+    draftEditor.type = draft.type || null
+    draftEditor.content = draft.content || ''
     reloadDrafts()
 }
 
@@ -128,14 +135,50 @@ function removeDraft(draft) {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        deleteTopicDraft(store.user.id, draft.id)
-        reloadDrafts()
-        ElMessage.success('草稿已删除')
+        apiForumTopicDraftDelete(draft.id, () => {
+            reloadDrafts()
+            ElMessage.success('草稿已删除')
+        })
     }).catch(() => {})
 }
 
 function formatDraftTime(time) {
     return new Date(time).toLocaleString()
+}
+
+function importLocalDrafts() {
+    const localDrafts = listTopicDrafts(store.user.id)
+    if(!localDrafts.length) return
+    ElMessageBox.confirm(`检测到 ${localDrafts.length} 条本地草稿，是否导入线上草稿箱？`, '导入本地草稿', {
+        confirmButtonText: '导入',
+        cancelButtonText: '暂不导入',
+        type: 'info'
+    }).then(() => {
+        let index = 0
+        let success = 0
+        const next = () => {
+            if(index >= localDrafts.length) {
+                reloadDrafts()
+                if(success === localDrafts.length) {
+                    clearTopicDrafts(store.user.id)
+                    ElMessage.success('本地草稿已导入线上草稿箱')
+                } else {
+                    ElMessage.warning('部分本地草稿导入失败，已保留本地数据')
+                }
+                return
+            }
+            const draft = localDrafts[index++]
+            apiForumTopicDraftSave({
+                title: draft.title || '',
+                type: draft.type || null,
+                content: draft.content || null
+            }, () => {
+                success++
+                next()
+            }, () => next())
+        }
+        next()
+    }).catch(() => {})
 }
 
 navigator.geolocation.getCurrentPosition(position => {
@@ -161,6 +204,7 @@ onMounted(() => {
     apiForumTopTopics(data => topics.top = data)
     apiAnnouncementLatest(3, data => announcements.value = data)
     reloadDrafts()
+    importLocalDrafts()
 })
 </script>
 

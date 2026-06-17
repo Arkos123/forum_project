@@ -10,8 +10,7 @@ import {accessHeader} from "@/net";
 import {ElMessage} from "element-plus";
 import ColorDot from "@/components/ColorDot.vue";
 import {useStore} from "@/store";
-import {apiForumTopicCreate} from "@/net/api/forum";
-import {deleteTopicDraft, saveTopicDraft} from "@/utils/topicDraft";
+import {apiForumTopicCreate, apiForumTopicDraftDelete, apiForumTopicDraftSave} from "@/net/api/forum";
 
 const store = useStore()
 
@@ -31,7 +30,7 @@ const props = defineProps({
     },
     draftId: {
         default: null,
-        type: String
+        type: Number
     },
     draftable: {
         default: true,
@@ -100,15 +99,16 @@ function findTypeById(id){
 }
 
 function saveDraft() {
-    const draft = saveTopicDraft(store.user.id, {
+    apiForumTopicDraftSave({
         id: currentDraftId.value,
         title: editor.title,
         type: editor.type?.id,
-        content: editor.text
+        content: editor.text?.ops ? editor.text : null
+    }, draft => {
+        currentDraftId.value = draft.id
+        ElMessage.success('草稿保存成功！')
+        emit('draft-save', draft)
     })
-    currentDraftId.value = draft.id
-    ElMessage.success('草稿保存成功！')
-    emit('draft-save', draft)
 }
 
 function submitTopic() {
@@ -126,9 +126,13 @@ function submitTopic() {
         return
     }
     props.submit(editor, () => {
-        if(props.draftable && currentDraftId.value)
-            deleteTopicDraft(store.user.id, currentDraftId.value)
-        emit('success', currentDraftId.value)
+        if(props.draftable && currentDraftId.value) {
+            apiForumTopicDraftDelete(currentDraftId.value,
+                () => emit('success', currentDraftId.value),
+                () => emit('success', currentDraftId.value))
+        } else {
+            emit('success', currentDraftId.value)
+        }
     })
 }
 
@@ -188,6 +192,7 @@ const editorOption = {
 
 <template>
   <el-drawer :model-value="show"
+             class="topic-editor-drawer"
              direction="btt"
              @open="initEditor"
              :close-on-click-modal="false"
@@ -239,12 +244,12 @@ const editorOption = {
 </template>
 
 <style scoped>
-:deep(.el-drawer) {
+:deep(.topic-editor-drawer) {
     width: 800px;
     margin: auto;
     border-radius: 10px 10px 0 0;
 }
-:deep(.el-drawer__header) {
+:deep(.topic-editor-drawer .el-drawer__header) {
     margin: 0;
 }
 </style>

@@ -32,6 +32,18 @@ export const apiForumCommentSubmit = (data, success) =>
 export const apiForumTopicCreate = (data, success) =>
     post('/api/forum/create-topic', data, success)
 
+export const apiForumTopicDraftList = (success, failure) =>
+    get('/api/forum/topic-draft/list', success, failure)
+
+export const apiForumTopicDraftDetail = (id, success, failure) =>
+    get(`/api/forum/topic-draft/detail?id=${id}`, success, failure)
+
+export const apiForumTopicDraftSave = (data, success, failure) =>
+    post('/api/forum/topic-draft/save', data, success, failure)
+
+export const apiForumTopicDraftDelete = (id, success, failure) =>
+    get(`/api/forum/topic-draft/delete?id=${id}`, success, failure)
+
 export const apiForumTopTopics = (success) =>
     get('/api/forum/top-topic', success)
 

@@ -226,6 +226,22 @@ CREATE TABLE `db_topic` (
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
+-- Table structure for db_topic_draft
+-- ----------------------------
+DROP TABLE IF EXISTS `db_topic_draft`;
+CREATE TABLE `db_topic_draft` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `type` int DEFAULT NULL,
+  `title` varchar(30) DEFAULT NULL,
+  `content` text,
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_topic_draft_user_update` (`user_id`, `update_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
 -- Records of db_topic
 -- ----------------------------
 BEGIN;

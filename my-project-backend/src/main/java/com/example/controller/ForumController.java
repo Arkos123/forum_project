@@ -6,9 +6,11 @@ import com.example.entity.dto.Interact;
 import com.example.entity.dto.Topic;
 import com.example.entity.vo.request.AddCommentVO;
 import com.example.entity.vo.request.TopicCreateVO;
+import com.example.entity.vo.request.TopicDraftSaveVO;
 import com.example.entity.vo.request.TopicUpdateVO;
 import com.example.entity.vo.response.*;
 import com.example.service.AccountService;
+import com.example.service.TopicDraftService;
 import com.example.service.TopicService;
 import com.example.service.WeatherService;
 import com.example.utils.Const;
@@ -31,6 +33,9 @@ public class ForumController {
 
     @Resource
     TopicService topicService;
+
+    @Resource
+    TopicDraftService topicDraftService;
 
     @Resource
     ControllerUtils utils;
@@ -62,6 +67,34 @@ public class ForumController {
             return RestBean.forbidden("您已被禁言，无法创建新的主题");
         }
         return utils.messageHandle(() -> topicService.createTopic(id, vo));
+    }
+
+    @GetMapping("/topic-draft/list")
+    public RestBean<List<TopicDraftVO>> listTopicDrafts(@RequestAttribute(Const.ATTR_USER_ID) int id) {
+        return RestBean.success(topicDraftService.listDrafts(id));
+    }
+
+    @GetMapping("/topic-draft/detail")
+    public RestBean<TopicDraftVO> topicDraft(@RequestParam @Min(1) int id,
+                                             @RequestAttribute(Const.ATTR_USER_ID) int userId) {
+        TopicDraftVO draft = topicDraftService.getDraft(userId, id);
+        return draft == null ? RestBean.failure(404, "草稿不存在") : RestBean.success(draft);
+    }
+
+    @PostMapping("/topic-draft/save")
+    public RestBean<TopicDraftVO> saveTopicDraft(@Valid @RequestBody TopicDraftSaveVO vo,
+                                                 @RequestAttribute(Const.ATTR_USER_ID) int id) {
+        String message = topicDraftService.saveDraft(id, vo);
+        return message == null ?
+                RestBean.success(topicDraftService.getDraft(id, vo.getId())) :
+                RestBean.failure(400, message);
+    }
+
+    @GetMapping("/topic-draft/delete")
+    public RestBean<Void> deleteTopicDraft(@RequestParam @Min(1) int id,
+                                           @RequestAttribute(Const.ATTR_USER_ID) int userId) {
+        topicDraftService.deleteDraft(userId, id);
+        return RestBean.success();
     }
 
     @GetMapping("/list-topic")
