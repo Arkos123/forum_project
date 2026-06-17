@@ -5,3 +5,4 @@ doc/
 
 .playwright-mcp
 *.png
+target/

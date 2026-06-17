@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.vo.response.AuthorizeVO;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

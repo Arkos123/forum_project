@@ -1,7 +1,8 @@
 package com.example.controller.admin;
 
-import com.example.entity.PageRestBean;
-import com.example.entity.RestBean;
+import com.example.common.entity.PageRestBean;
+import com.example.common.entity.RestBean;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.entity.dto.EmailRecord;
 import com.example.service.EmailService;
 import jakarta.annotation.Resource;
@@ -21,7 +22,8 @@ public class EmailAdminController {
     @GetMapping("/list")
     public PageRestBean<EmailRecord> listEmailRecord(@RequestParam int page,
                                         @RequestParam int size){
-        return PageRestBean.success(service.listEmailRecord(page, size));
+        Page<EmailRecord> result = service.listEmailRecord(page, size);
+        return PageRestBean.success(result.getRecords(), result.getTotal(), result.getCurrent());
     }
 
     @GetMapping("/resend")

@@ -1,8 +1,8 @@
 package com.example.controller.admin;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.entity.PageRestBean;
-import com.example.entity.RestBean;
+import com.example.common.entity.PageRestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.vo.request.AnnouncementCreateVO;
 import com.example.entity.vo.request.AnnouncementPublishVO;
 import com.example.entity.vo.request.AnnouncementTopVO;
@@ -29,7 +29,7 @@ public class AnnouncementAdminController {
                                                   @RequestParam(required = false) String keyword,
                                                   @RequestParam(required = false) Boolean published) {
         Page<AnnouncementAdminVO> result = service.listAll(page, size, keyword, published);
-        return PageRestBean.success(result);
+        return PageRestBean.success(result.getRecords(), result.getTotal(), result.getCurrent());
     }
 
     @PostMapping("/create")

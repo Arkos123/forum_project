@@ -23,7 +23,20 @@ mvn spring-boot:run
 forum-monolith-service
 ```
 
-3. 启动 Gateway：
+3. 启动 OSS 服务：
+
+```bash
+cd oss-service
+mvn spring-boot:run
+```
+
+OSS 服务注册服务名：
+
+```text
+oss-service
+```
+
+4. 启动 Gateway：
 
 ```bash
 cd gateway-service
@@ -39,8 +52,10 @@ Gateway 默认端口：
 ## 当前路由
 
 ```text
-/api/**     -> lb://forum-monolith-service
-/images/**  -> lb://forum-monolith-service
+/api/image/**  -> lb://oss-service
+/api/file/**   -> lb://oss-service
+/images/**     -> lb://oss-service
+/api/**        -> lb://forum-monolith-service
 ```
 
 ## 可配置项
@@ -51,6 +66,10 @@ NACOS_SERVER_ADDR    Nacos 地址，默认 localhost:8848
 NACOS_DISCOVERY_ENABLED  是否启用 Nacos 注册发现，默认 true
 GATEWAY_CORS_ALLOWED_ORIGIN  CORS 允许来源，默认 http://127.0.0.1:5273
 GATEWAY_CORS_ALLOWED_ORIGIN_ALT  CORS 备用允许来源，默认 http://localhost:5273
+JWT_KEY  JWT 签名密钥，需要和单体后端保持一致，默认 abcdefghijklmn
+REDIS_HOST  Redis 地址，默认 localhost
+REDIS_PORT  Redis 端口，默认 6379
+REDIS_DATABASE  Redis database，默认 1
 ```
 
 示例：
@@ -67,7 +86,15 @@ NACOS_DISCOVERY_ENABLED=false mvn spring-boot:run
 
 ## 当前边界
 
-这一版 Gateway 负责统一处理 CORS，但不做 JWT 鉴权，认证和权限仍由单体后端处理。后续可以逐步把 token 校验、用户身份透传和后台权限拦截前移到 Gateway。
+这一版 Gateway 负责统一处理 CORS 和 JWT 鉴权。登录、登出、注册、重置密码仍由单体后端处理；OSS 相关接口转发到 `oss-service`；其他 `/api/**` 请求由 Gateway 校验 JWT 后放行，并向下游服务透传用户身份：
+
+```text
+X-User-Id
+X-Username
+X-User-Roles
+```
+
+`/api/admin/**` 会在 Gateway 校验 `ROLE_admin` 权限。
 
 单体后端的 CORS 默认关闭，避免和 Gateway 重复写入响应头。需要绕过 Gateway 直连后端调试时，可以用下面的环境变量临时开启：
 

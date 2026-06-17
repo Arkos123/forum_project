@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.service.ImageService;
 import io.minio.errors.ErrorResponseException;
 import jakarta.annotation.Resource;

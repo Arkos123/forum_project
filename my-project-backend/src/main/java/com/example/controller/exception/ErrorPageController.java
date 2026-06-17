@@ -1,6 +1,6 @@
 package com.example.controller.exception;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
 import org.springframework.boot.web.error.ErrorAttributeOptions;

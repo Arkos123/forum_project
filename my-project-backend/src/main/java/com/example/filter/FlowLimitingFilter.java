@@ -1,6 +1,6 @@
 package com.example.filter;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.utils.Const;
 import com.example.utils.FlowUtils;
 import jakarta.annotation.Resource;

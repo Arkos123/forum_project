@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.Interact;
 import com.example.entity.dto.Topic;

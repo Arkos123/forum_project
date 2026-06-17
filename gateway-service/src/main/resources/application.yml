@@ -4,6 +4,14 @@ server:
 spring:
   application:
     name: gateway-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:1}
+  security:
+    jwt:
+      key: ${JWT_KEY:abcdefghijklmn}
   cloud:
     nacos:
       discovery:
@@ -35,10 +43,15 @@ spring:
           default-filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials RETAIN_FIRST
           routes:
+            - id: oss-service
+              uri: lb://oss-service
+              order: -10
+              predicates:
+                - Path=/api/image/**,/api/file/**,/images/**
             - id: forum-monolith-service
               uri: lb://forum-monolith-service
               predicates:
-                - Path=/api/**,/images/**
+                - Path=/api/**
 
 management:
   endpoints:

@@ -1,6 +1,6 @@
 package com.example.controller.exception;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;

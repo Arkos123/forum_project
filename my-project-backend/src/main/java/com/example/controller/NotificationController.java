@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.vo.response.NotificationVO;
 import com.example.service.NotificationService;
 import com.example.utils.Const;

@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.dto.AiConversation;
 import com.example.service.AiConversationService;
 import com.example.utils.Const;

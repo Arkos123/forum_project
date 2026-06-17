@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.service.ImageService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;

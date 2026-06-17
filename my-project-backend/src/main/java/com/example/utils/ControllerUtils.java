@@ -1,6 +1,6 @@
 package com.example.utils;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;

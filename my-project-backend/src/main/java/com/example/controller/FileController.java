@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.utils.Const;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;

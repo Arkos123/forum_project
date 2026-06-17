@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: "optional:file:./.env"
+  cloud:
+    nacos:
+      discovery:
+        enabled: ${NACOS_DISCOVERY_ENABLED:true}
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:1}
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/study_main}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    username: ${MINIO_USERNAME:minio}
+    password: ${MINIO_PASSWORD:password}

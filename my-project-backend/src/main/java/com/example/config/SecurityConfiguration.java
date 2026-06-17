@@ -1,9 +1,10 @@
 package com.example.config;
 
-import com.example.entity.RestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.vo.response.AuthorizeVO;
 import com.example.filter.JwtAuthenticationFilter;
+import com.example.filter.GatewayIdentityFilter;
 import com.example.filter.RequestLogFilter;
 import com.example.service.AccountService;
 import com.example.utils.Const;
@@ -36,6 +37,9 @@ public class SecurityConfiguration {
 
     @Resource
     JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Resource
+    GatewayIdentityFilter gatewayIdentityFilter;
 
     @Resource
     RequestLogFilter requestLogFilter;
@@ -83,6 +87,7 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(requestLogFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, RequestLogFilter.class)
+                .addFilterBefore(gatewayIdentityFilter, JwtAuthenticationFilter.class)
                 .build();
     }
 

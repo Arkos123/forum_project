@@ -2,8 +2,8 @@ package com.example.controller.admin;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.example.entity.PageRestBean;
-import com.example.entity.RestBean;
+import com.example.common.entity.PageRestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.vo.request.TopicTypeCreateVO;
 import com.example.entity.vo.response.TopicPreviewVO;
 import com.example.entity.vo.response.TopicTypeVO;

@@ -13,7 +13,12 @@ const accessHeader = () => {
 const defaultError = (error) => {
     console.error(error)
     const status = error.response?.status
-    if (status === 429) {
+    if (status === 401) {
+        ElMessage.warning(error.response.data?.message || '登录状态已过期，请重新登录！')
+        deleteAccessToken(true)
+    } else if (status === 403) {
+        ElMessage.warning(error.response.data?.message || '权限不足，无法访问')
+    } else if (status === 429) {
         ElMessage.error(error.response.data.message)
     } else if (!error.response) {
         ElMessage.error('网络连接异常，请检查服务是否正常运行')

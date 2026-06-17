@@ -1,8 +1,8 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.entity.PageRestBean;
-import com.example.entity.RestBean;
+import com.example.common.entity.PageRestBean;
+import com.example.common.entity.RestBean;
 import com.example.entity.vo.response.AnnouncementDetailVO;
 import com.example.entity.vo.response.AnnouncementPreviewVO;
 import com.example.service.AnnouncementService;
@@ -32,7 +32,7 @@ public class AnnouncementController {
     public PageRestBean<AnnouncementPreviewVO> list(@RequestParam @Min(0) int page,
                                                     @RequestParam(defaultValue = "10") @Min(1) @Max(50) int size) {
         Page<AnnouncementPreviewVO> result = service.listPublished(page + 1, size);
-        return PageRestBean.success(result);
+        return PageRestBean.success(result.getRecords(), result.getTotal(), result.getCurrent());
     }
 
     @GetMapping("/detail")
