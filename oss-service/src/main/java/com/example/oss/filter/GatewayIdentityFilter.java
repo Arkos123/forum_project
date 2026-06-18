@@ -30,7 +30,7 @@ public class GatewayIdentityFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
         if (path.startsWith("/internal/")) {
-            if (internalToken.equals(request.getHeader(GatewayHeaders.INTERNAL_TOKEN))) {
+            if (hasValidInternalToken(request)) {
                 filterChain.doFilter(request, response);
             } else {
                 writeUnauthorized(response);
@@ -43,7 +43,7 @@ public class GatewayIdentityFilter extends OncePerRequestFilter {
         }
 
         String userId = request.getHeader(GatewayHeaders.USER_ID);
-        if (userId == null || userId.isBlank()) {
+        if (!hasValidInternalToken(request) || userId == null || userId.isBlank()) {
             writeUnauthorized(response);
             return;
         }
@@ -61,6 +61,10 @@ public class GatewayIdentityFilter extends OncePerRequestFilter {
         return path.startsWith("/images/")
                 || path.startsWith("/actuator/")
                 || path.startsWith("/error");
+    }
+
+    private boolean hasValidInternalToken(HttpServletRequest request) {
+        return internalToken.equals(request.getHeader(GatewayHeaders.INTERNAL_TOKEN));
     }
 
     private void writeUnauthorized(HttpServletResponse response) throws IOException {

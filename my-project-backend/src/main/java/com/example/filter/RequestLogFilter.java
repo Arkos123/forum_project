@@ -1,5 +1,6 @@
 package com.example.filter;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.example.utils.Const;
 import com.example.utils.SnowflakeIdGenerator;
@@ -17,6 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -29,7 +32,13 @@ public class RequestLogFilter extends OncePerRequestFilter {
     @Resource
     SnowflakeIdGenerator generator;
 
-    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/images", "/api/ai/chat");
+    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs");
+    private final Set<String> sensitiveFieldFragments = Set.of(
+            "password", "token", "authorization", "secret"
+    );
+    private final Set<String> sensitiveFieldNames = Set.of(
+            "verificationcode", "emailcode", "captcha"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -66,7 +75,9 @@ public class RequestLogFilter extends OncePerRequestFilter {
         long time = System.currentTimeMillis() - startTime;
         int status = wrapper.getStatus();
         String content = status != 200 ?
-                status + " 错误" : new String(wrapper.getContentAsByteArray());
+                status + " 错误" : sanitizeJson(new String(
+                        wrapper.getContentAsByteArray(), StandardCharsets.UTF_8
+                ));
         log.info("请求处理耗时: {}ms | 响应结果: {}", time, content);
     }
 
@@ -78,7 +89,10 @@ public class RequestLogFilter extends OncePerRequestFilter {
         long reqId = generator.nextId();
         MDC.put("reqId", String.valueOf(reqId));
         JSONObject object = new JSONObject();
-        request.getParameterMap().forEach((k, v) -> object.put(k, v.length > 0 ? v[0] : null));
+        request.getParameterMap().forEach((k, v) -> object.put(
+                k,
+                isSensitiveField(k) ? "<redacted>" : v.length > 0 ? v[0] : null
+        ));
         Object id = request.getAttribute(Const.ATTR_USER_ID);
         if(id != null) {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -89,5 +103,38 @@ public class RequestLogFilter extends OncePerRequestFilter {
             log.info("请求URL: \"{}\" ({}) | 远程IP地址: {} │ 身份: 未验证 | 请求参数列表: {}",
                     request.getServletPath(), request.getMethod(), request.getRemoteAddr(), object);
         }
+    }
+
+    private String sanitizeJson(String content) {
+        if (content == null || content.isBlank()) {
+            return content;
+        }
+        try {
+            Object value = JSONObject.parse(content);
+            redactSensitiveFields(value);
+            return JSONObject.toJSONString(value);
+        } catch (Exception ignored) {
+            return content;
+        }
+    }
+
+    private void redactSensitiveFields(Object value) {
+        if (value instanceof JSONObject object) {
+            object.forEach((key, nestedValue) -> {
+                if (isSensitiveField(key)) {
+                    object.put(key, "<redacted>");
+                } else {
+                    redactSensitiveFields(nestedValue);
+                }
+            });
+        } else if (value instanceof JSONArray array) {
+            array.forEach(this::redactSensitiveFields);
+        }
+    }
+
+    private boolean isSensitiveField(String fieldName) {
+        String normalizedName = fieldName.toLowerCase(Locale.ROOT);
+        return sensitiveFieldNames.contains(normalizedName)
+                || sensitiveFieldFragments.stream().anyMatch(normalizedName::contains);
     }
 }

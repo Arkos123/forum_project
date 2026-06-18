@@ -62,9 +62,11 @@ OSS 服务不解析 JWT，登录态由 Gateway 统一校验。Gateway 会向 OSS
 X-User-Id
 X-Username
 X-User-Roles
+X-Internal-Token
 ```
 
-`/api/image/**` 和 `/api/file/**` 缺少 `X-User-Id` 时会返回 401。`/images/**` 公开放行。
+`/api/image/**` 和 `/api/file/**` 同时校验用户 ID 与内部服务凭证，任一缺失或错误
+都会返回 401，防止客户端绕过 Gateway 后伪造身份头。`/images/**` 公开放行。
 
 ## 可配置项
 

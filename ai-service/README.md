@@ -46,6 +46,10 @@ INTERNAL_SERVICE_TOKEN  必须与 Gateway、单体和 OSS 一致
 启动：
 
 ```bash
+set -a
+source ../my-project-backend/.env
+set +a
+export INTERNAL_SERVICE_TOKEN=your-shared-token
 mvn spring-boot:run
 ```
 

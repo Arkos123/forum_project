@@ -63,21 +63,9 @@ spring:
       origin: '*'
       credentials: false
       methods: '*'
-  minio:
-    endpoint: 'http://localhost:9000'
-    username: 'minio'
-    password: 'password'
   weather:
     api-host: 'jx46h4hdc6.re.qweatherapi.com'
     key: ${WEATHER_KEY:}
-  ai:
-    deepseek:
-      api-key: ${DEEPSEEK_KEY:}
-      base-url: 'https://api.deepseek.com'
-    tavily:
-      api-key: ${TAVILY_API_KEY:}
-    siliconflow:
-      api-key: ${SILICONFLOW_API_KEY:}
 internal:
   service:
     token: ${INTERNAL_SERVICE_TOKEN:change-me-in-production}

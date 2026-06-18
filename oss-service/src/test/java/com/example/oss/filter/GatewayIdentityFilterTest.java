@@ -37,4 +37,16 @@ class GatewayIdentityFilterTest {
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(chain.getRequest()).isSameAs(request);
     }
+
+    @Test
+    void businessEndpointRejectsForgedUserHeaderWithoutServiceCredential()
+            throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/file/text");
+        request.addHeader(GatewayHeaders.USER_ID, "1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, new MockFilterChain());
+
+        assertThat(response.getStatus()).isEqualTo(401);
+    }
 }
