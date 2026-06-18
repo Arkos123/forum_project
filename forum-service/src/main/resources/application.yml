@@ -1,0 +1,12 @@
+server:
+  port: ${FORUM_SERVICE_PORT:8088}
+
+spring:
+  application:
+    name: forum-service
+  profiles:
+    active: '@environment@'
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB

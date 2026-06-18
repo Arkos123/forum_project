@@ -60,13 +60,18 @@ spring:
               order: -5
               predicates:
                 - Path=/api/auth/**,/api/user/**,/api/admin/user/**,/api/admin/email/**
+            - id: announcement-service
+              uri: lb://announcement-service
+              order: -4
+              predicates:
+                - Path=/api/announcement/**,/api/admin/announcement/**
             - id: notification-service
               uri: lb://notification-service
               order: -3
               predicates:
                 - Path=/api/notification/**
-            - id: forum-monolith-service
-              uri: lb://forum-monolith-service
+            - id: forum-service
+              uri: lb://forum-service
               predicates:
                 - Path=/api/**
 

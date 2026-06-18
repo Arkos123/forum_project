@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "forum-monolith-service", contextId = "forumInternalClient")
+@FeignClient(name = "forum-service", contextId = "forumInternalClient")
 public interface ForumInternalClient {
 
     @GetMapping("/internal/forum/search")

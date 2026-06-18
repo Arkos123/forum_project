@@ -1,0 +1,58 @@
+# Dev profile configuration
+logging:
+  level:
+    com.example.filter.FlowLimitingFilter: DEBUG
+
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    operations-sorter: alpha
+
+spring:
+  config:
+    import: "optional:file:./.env"
+  cloud:
+    nacos:
+      discovery:
+        enabled: ${NACOS_DISCOVERY_ENABLED:true}
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+  data:
+    redis:
+      database: 1
+  rabbitmq:
+    addresses: ${RABBITMQ_HOST:localhost}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    virtual-host: /
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000ms
+  elasticsearch:
+    uris: ${ES_URIS:localhost:9200}
+    username: ${ES_USERNAME:elastic}
+    password: ${ES_PASSWORD:123456}
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/study_main}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  web:
+    flow:
+      period: 3
+      limit: 3000
+      block: 5
+    cors:
+      enabled: ${BACKEND_CORS_ENABLED:false}
+      origin: '*'
+      credentials: false
+      methods: '*'
+  weather:
+    api-host: '${WEATHER_API_HOST:jx46h4hdc6.re.qweatherapi.com}'
+    key: ${WEATHER_KEY:}
+
+internal:
+  service:
+    token: ${INTERNAL_SERVICE_TOKEN:change-me-in-production}
