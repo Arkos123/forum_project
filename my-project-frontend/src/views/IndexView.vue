@@ -1,5 +1,6 @@
 <script setup>
 import {inject, reactive, ref} from "vue";
+import logoSvg from "@/assets/logo.svg";
 import {
     Bell,
     ChatDotSquare, ChatLineSquare, Check, CoffeeCup,
@@ -89,7 +90,7 @@ apiForumTypes(data => {
         <el-container style="height: 100%" v-if="!loading">
             <el-header class="main-content-header">
                 <div style="width: 320px;height: 32px">
-                    <el-image class="logo" src="https://element-plus.org/images/element-plus-logo.svg"/>
+                    <el-image class="logo" :src="logoSvg"/>
                 </div>
                 <div style="flex: 1;padding: 0 20px;text-align: center">
                     <el-autocomplete v-model="searchInput.text" style="width: 100%;max-width: 500px"

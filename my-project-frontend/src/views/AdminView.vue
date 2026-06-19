@@ -8,6 +8,7 @@ import {
 } from "@element-plus/icons-vue";
 import UserInfo from "@/components/UserInfo.vue";
 import {inject, onMounted, ref} from "vue";
+import logoSvg from "@/assets/logo.svg";
 import router from "@/router";
 import {useRoute} from "vue-router";
 
@@ -69,7 +70,7 @@ onMounted(() => {
         <el-container style="height: 100%">
             <el-aside width="230px" class="admin-content-aside">
                 <div class="logo-box">
-                    <el-image class="logo" src="https://element-plus.org/images/element-plus-logo.svg"/>
+                    <el-image class="logo" :src="logoSvg"/>
                 </div>
                 <el-scrollbar style="height: calc(100vh - 57px)">
                     <el-menu

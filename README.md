@@ -39,16 +39,16 @@
 
 ### 1. 配置 API 密钥
 
-各微服务通过自身目录下的 `.env` 文件加载密钥（已配置 `.gitignore`，不会提交）。首次使用请确认以下 `.env` 文件已创建：
+各微服务通过自身目录下的 `.env.properties` 文件加载密钥（已配置 `.gitignore`，不会提交）。首次使用请确认以下文件已创建：
 
 | 服务 | 必需密钥 | 参考模板 |
 |------|---------|---------|
-| `user-service/.env` | `STMP_EMAIL`, `STMP_EMAIL_PASSWORD`, `JWT_KEY` | `my-project-backend/.env.properties` |
-| `ai-service/.env` | `DEEPSEEK_KEY`, `TAVILY_API_KEY`, `SILICONFLOW_API_KEY` | 同上 |
-| `forum-service/.env` | `WEATHER_KEY` | 同上 |
-| `oss-service/.env` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
-| `notification-service/.env` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
-| `announcement-service/.env` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
+| `user-service/.env.properties` | `STMP_EMAIL`, `STMP_EMAIL_PASSWORD`, `JWT_KEY` | `my-project-backend/.env.properties` |
+| `ai-service/.env.properties` | `DEEPSEEK_KEY`, `TAVILY_API_KEY`, `SILICONFLOW_API_KEY` | 同上 |
+| `forum-service/.env.properties` | `WEATHER_KEY` | 同上 |
+| `oss-service/.env.properties` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
+| `notification-service/.env.properties` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
+| `announcement-service/.env.properties` | `INTERNAL_SERVICE_TOKEN`（可选） | — |
 
 > **gateway-service** 不支持 `.env` 文件，需要 `JWT_KEY` 时通过系统环境变量设置。
 
@@ -159,7 +159,7 @@ cd docker && bash setup.sh
 | 服务 | 端口 | 认证 |
 |------|------|------|
 | Nacos | 8848 (控制台/API)、9848/9849 (gRPC) | 开发模式无认证 |
-| MySQL 8.0 | 3600→3306 | root / 123456 |
+| MySQL 8.0 | 3306 | root / 123456 |
 | Redis 7 | 6379 | 无密码 |
 | Elasticsearch 8.18.8 | 9200 | elastic / 123456 |
 | RabbitMQ 3.12 | 5672 / 15672(管理) | admin / admin |

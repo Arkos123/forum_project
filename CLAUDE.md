@@ -188,7 +188,7 @@ npm run preview      # 预览构建产物
 | 服务 | 端口 | 认证 |
 |------|------|------|
 | Nacos 2.3.2 | 8848 / 9848(gRPC) | 无 (开发模式) |
-| MySQL 8.0 | 3306 (映射 3600) | root / 123456 |
+| MySQL 8.0 | 3306 | root / 123456 |
 | Redis 7 | 6379 | 无密码 |
 | Elasticsearch 8.18.8 | 9200 | elastic / 123456 |
 | RabbitMQ 3.12 | 5672 / 15672(管理) | admin / admin |
